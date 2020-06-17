@@ -1,7 +1,7 @@
 void keyboard(void)
 {
-   const float x_angle = sin(hero.b+(hero.a/2));
-   const float y_angle = cos(hero.b+(hero.a/2));
+   const float x_angle = sin(hero.b+0.01*stty_width/2);
+   const float y_angle = cos(hero.b+0.01*stty_width/2);
 
    switch(getch())
    {

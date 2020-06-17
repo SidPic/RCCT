@@ -79,7 +79,7 @@ void display(void)
    getmaxyx(stdscr, stty_height, stty_width); // ?? оно сильно надо?
    clear();
 
-   float b = hero.b, x2, y2, s, dSize = 0.01, p = 0, delta;
+   float b = hero.b, x2, y2, s = 1, ts, dSize = 0.01, p = 0, delta;
    unsigned char i = 0, height, color = 1;
 
 //   drawMiniMap();
@@ -94,6 +94,7 @@ void display(void)
       delta = abs(stty_width/2-(b-hero.b)/i);
       if (delta <= 0) delta = 1;
 
+      ts = s;
       s = goLine(hero.x, hero.y, x2, y2);
 
       height = (int)round(stty_height/s);
@@ -106,7 +107,14 @@ void display(void)
 
       b += dSize;
 
-      drawColumn(i, stty_height/2-height/2, height, ' ' | A_REVERSE | COLOR_PAIR(color));
+      if (s == ceil(ts))
+      {
+         drawColumn(i, stty_height/2-height/2, height, '|' | A_REVERSE | COLOR_PAIR(color));
+      }
+      else
+      {
+         drawColumn(i, stty_height/2-height/2, height, ' ' | A_REVERSE | COLOR_PAIR(color));
+      }
    }
 
    mvaddch(stty_height/2, stty_width/2, '+');
