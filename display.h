@@ -1,3 +1,6 @@
+static int Ch;
+unsigned char center_x, center_y;
+
 float goLine(float fx, float fy, float sx, float sy)
 {
    const float deltaX = abs(sx - fx);
@@ -7,9 +10,11 @@ float goLine(float fx, float fy, float sx, float sy)
 
    float error = deltaX - deltaY, error2, S = 0;
 
-   while (map[(int)round(fy)][(int)round(fx)] == ' ' && (fx != sx || fy != sy))
+   while ((map[(int)round(fy)][(int)round(fx)] == ' ' ||
+           map[(int)round(fy)][(int)round(fx)] == '.')&& (fx != sx || fy != sy))
    {
-//      mvaddch((int)round(fy), (int)round(fx), '.');
+      viewMap[(int)round(fy)][(int)round(fx)] = map[(int)round(fy)][(int)round(fx)];
+      viewMap[(int)round(fy)][(int)round(fx)] = '.';
       error2 = error*2;
 
       if (error2 > -deltaY)
@@ -25,6 +30,10 @@ float goLine(float fx, float fy, float sx, float sy)
          S += 0.01;
       }
    }
+
+   viewMap[(int)round(fy)][(int)round(fx)] = map[(int)round(fy)][(int)round(fx)];
+   if (map[(int)round(fy)][(int)round(fx)] == 'f')
+      Ch = ' ' | A_REVERSE | COLOR_PAIR(50);
 
    return S;
 }
@@ -47,19 +56,19 @@ void drawRow(unsigned char y, int ch)
    }
 }
 
-void drawFloor()
+void drawFloor(void)
 {
-   unsigned char i = stty_height/2;
+   unsigned char i = center_y;
    for (i; i < stty_height; i++)
    {
-      drawRow(i, '#' | COLOR_PAIR(19-i+stty_height/2));
+      drawRow(i, '#' | COLOR_PAIR(19-i+center_y));
    }
 }
 
-void drawCeil()
+void drawCeil(void)
 {
    unsigned char i = 0;
-   for (i; i < stty_height/2; i++)
+   for (i; i < center_y; i++)
    {
       drawRow(i, '`' | COLOR_PAIR(i));
    }
@@ -67,23 +76,32 @@ void drawCeil()
 
 void drawMiniMap(void)
 {
-   unsigned char i = 0;
-
-   for (i; i < MAP_SIZE; i++)
-      mvaddstr(i, 0, map[i]);
-   mvaddch(hero.y, hero.x, '@');
+   for (short i = hero.y-5; i <= hero.y+5; i++)
+   for (short j = hero.x-10; j <= hero.x+10; j++)
+   {
+      if (i >= 0 && i < MAP_SIZE && j >= 0 && j < MAP_SIZE && viewMap[i][j] != '\0')
+      {
+         mvaddch(i+stty_height-5-hero.y, j+5-hero.x, viewMap[i][j] | COLOR_PAIR(50));
+         if (viewMap[i][j] == '.') viewMap[i][j] = ' ';
+      }
+      else mvaddch(i+stty_height-5-hero.y, j+5-hero.x, ' ' | COLOR_PAIR(50));
+   }
+   mvaddch(stty_height-5, 5, '@' | COLOR_PAIR(50));
 }
 
 void display(void)
 {
-   getmaxyx(stdscr, stty_height, stty_width); // ?? оно сильно надо?
-   clear();
 
-   float b = hero.b, x2, y2, s = 1, ts, dSize = 0.01, p = 0, delta;
+   getmaxyx(stdscr, stty_height, stty_width); // ?? оно сильно надо?
+   center_x = stty_width/2;                  //
+   center_y = stty_height/2;                //
+
+   srand(1000);
+
+   float b = hero.b, x2, y2, s = 1, dSize = 0.01, p = 0, ts;
    unsigned char i = 0, height, color = 1;
 
-//   drawMiniMap();
-
+   clear();
    drawCeil();
    drawFloor();
 
@@ -91,8 +109,6 @@ void display(void)
    {
       x2 = hero.x + sin(b)*hero.d;
       y2 = hero.y + cos(b)*hero.d;
-      delta = abs(stty_width/2-(b-hero.b)/i);
-      if (delta <= 0) delta = 1;
 
       ts = s;
       s = goLine(hero.x, hero.y, x2, y2);
@@ -101,23 +117,24 @@ void display(void)
       if (height < 0) height = 0;
       if (height >= stty_height) height = stty_height;
 
-      color = round(s);
+      color = (int)(s);
       if (color <= 0) color = 1;
-      if (color > 17) color = 17;
+      if (color >= 20) color = 20;
+
+      if (s > ts)
+         Ch = ' ' | A_REVERSE | COLOR_PAIR(color);
+      else if (s < ts)
+         Ch = ' ' | A_REVERSE | COLOR_PAIR(color+3);
 
       b += dSize;
+      if (b > hero.b+0.01*stty_width)
+         break;
 
-      if (s == ceil(ts))
-      {
-         drawColumn(i, stty_height/2-height/2, height, '|' | A_REVERSE | COLOR_PAIR(color));
-      }
-      else
-      {
-         drawColumn(i, stty_height/2-height/2, height, ' ' | A_REVERSE | COLOR_PAIR(color));
-      }
+      drawColumn(i, center_y-height/2, height, Ch);
    }
 
-   mvaddch(stty_height/2, stty_width/2, '+');
+   mvaddch(center_y, center_x, '+' | A_REVERSE);
+   drawMiniMap();
 
    refresh();
 }

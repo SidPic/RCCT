@@ -4,8 +4,8 @@
 #include <ncurses.h>
 #include <stdbool.h>
 
-#include "hero.h"
 #include "map.h"
+#include "hero.h"
 #include "init.h"
 #include "display.h"
 #include "keyboard.h"
