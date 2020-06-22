@@ -112,8 +112,9 @@ void display(void)
 
       ts = s;
       s = goLine(hero.x, hero.y, x2, y2);
+      p = s/cos(abs(stty_width/dSize-sin(b)*hero.d));
 
-      height = (int)round(stty_height/s);
+      height = (int)round(stty_height/p);
       if (height < 0) height = 0;
       if (height >= stty_height) height = stty_height;
 
