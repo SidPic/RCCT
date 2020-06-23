@@ -68,7 +68,7 @@ void display(void)
       if (height >= stty_height) height = stty_height;
 
       px = i;
-      if (px > 450) px -= 450*px/450;
+      if (px > 450) px -= 450*(round(px/450)-1);
 
       sandstone_sprite.setPosition(i, center_y-height/2);
       sandstone_sprite.setTextureRect(sf::IntRect(px, 0, 1, height));
