@@ -13,6 +13,7 @@ void init(void)
 
    sandstone_image.loadFromFile("Images/sandstone.jpg");
    sandstone_texture.loadFromImage(sandstone_image);
+   sandstone_texture.setRepeated(true);
    sandstone_sprite.setTexture(sandstone_texture);
 }
 

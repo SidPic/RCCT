@@ -1,5 +1,6 @@
 static int Ch;
 unsigned short center_x, center_y;
+static float EX, EY;
 
 float goLine(float fx, float fy, float sx, float sy)
 {
@@ -28,6 +29,9 @@ float goLine(float fx, float fy, float sx, float sy)
       }
    }
 
+   EY = fy;
+   EX = fx;
+
    return S;
 }
 
@@ -45,8 +49,10 @@ void display(void)
    center_x = stty_width/2;
    center_y = stty_height/2;
 
-   float b = hero.b, x2, y2, s = 1, dSize = 0.001, ts, px;
+   float b = hero.b, x2, y2, s = 1, dSize = 0.001, ts, px, py;
    short i = 0, height, color = 1, dcolor;
+
+   const short fy = 0, ey = 305, ex = 1;
 
    for (i; i < stty_width; i++)
    {
@@ -67,12 +73,10 @@ void display(void)
       if (height < 0) height = 0;
       if (height >= stty_height) height = stty_height;
 
-      px = i;
-      if (px > 450) px -= 450*(round(px/450)-1);
-
-      sandstone_sprite.setPosition(i, center_y-height/2);
-      sandstone_sprite.setTextureRect(sf::IntRect(px, 0, 1, height));
+      sandstone_sprite.setTextureRect(sf::IntRect((EX+EY)*300, fy, ex, ey));
       sandstone_sprite.setColor(sf::Color(255-dcolor, 255-dcolor, 255-dcolor));
+      sandstone_sprite.setScale(1, 2.5/s);
+      sandstone_sprite.setPosition(i, center_y-height/2);
       window.draw(sandstone_sprite);
    }
    window.display();

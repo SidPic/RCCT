@@ -2,11 +2,11 @@
 
 ..Компиляция
 
-....gcc ./main.c -lm -lncursesw -O2
+....g++ -c ./main.cpp && g++ ./*.o -o ./main -lsfml-graphics -lsfml-window -lsfml-system
 
 ..Запуск
 
-   ./a.out
+   ./main
 
 ..Управление:  
 
