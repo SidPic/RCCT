@@ -49,33 +49,38 @@ void display(void)
    center_x = stty_width/2;
    center_y = stty_height/2;
 
-   float b = hero.b, x2, y2, s = 1, dSize = 0.001, ts, px, py;
+   float b = hero.b, x2, y2, s = 1, dSize = 0.001, ts, px, py, p, P;
    short i = 0, height, color = 1, dcolor;
 
    const short fy = 0, ey = 305, ex = 1;
 
    for (i; i < stty_width; i++)
    {
+      b += dSize;
+      if (b > hero.b+dSize*stty_width)
+         break;
+
       x2 = hero.x + sin(b)*hero.d;
       y2 = hero.y + cos(b)*hero.d;
 
       s = goLine(hero.x, hero.y, x2, y2);
 
-      dcolor = round(s*10+s*10);
+      dcolor = round(s*22);
 
-      b += dSize;
-      if (b > hero.b+dSize*stty_width)
-         break;
       if (dcolor >= 255)
          continue;
 
-      height = (int)round(stty_height/s);
-      if (height < 0) height = 0;
-      if (height >= stty_height) height = stty_height;
+      p = abs((dSize*stty_width/2)-(b-hero.b));
+      if (p < 1) p = 1;
+      P = s;
 
-      sandstone_sprite.setTextureRect(sf::IntRect((EX+EY)*300, fy, ex, ey));
+      height = (int)round(stty_height/P);
+      if (height < -2000) height = -2000;
+      if (height > stty_height+2000) height = stty_height+2000;
+
+      sandstone_sprite.setTextureRect(sf::IntRect(round((EX+EY)*368), fy, ex, ey));
       sandstone_sprite.setColor(sf::Color(255-dcolor, 255-dcolor, 255-dcolor));
-      sandstone_sprite.setScale(1, 2.5/s);
+      sandstone_sprite.setScale(1.00f, 2.5/P);
       sandstone_sprite.setPosition(i, center_y-height/2);
       window.draw(sandstone_sprite);
    }

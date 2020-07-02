@@ -1,5 +1,5 @@
 unsigned short stty_height = 768, stty_width = 1366;
-sf::RenderWindow window(sf::VideoMode(1366, 768), "RCoC", sf::Style::Fullscreen);
+sf::RenderWindow window(sf::VideoMode(stty_width, stty_height), "RCoC", sf::Style::Fullscreen);
 sf::Event event;
 sf::Clock gameTimer;
 float gameTime = 1;
@@ -15,6 +15,8 @@ void init(void)
    sandstone_texture.loadFromImage(sandstone_image);
    sandstone_texture.setRepeated(true);
    sandstone_sprite.setTexture(sandstone_texture);
+
+   window.setMouseCursorVisible(false);
 }
 
 void end(void)
